@@ -30,7 +30,7 @@ def main():
         if step % 100 == 0:
             print(f"step {step:4d}  loss={loss.data:.6f}")
 
-    assert float(loss.data) < 0.1, f"XOR did not converge: loss={loss.data:.4f}"
+    assert float(loss.data) < 0.01, f"XOR did not converge: loss={loss.data:.4f}"
     print("XOR converged!")
 
 

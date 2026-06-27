@@ -132,11 +132,12 @@ class Tensor:
 
     def exp(self):
         out = Tensor(np.exp(self.data), requires_grad=self.requires_grad)
+        out_data = out.data.copy()
 
         def _back():
             if self.requires_grad:
                 self._ensure_grad()
-                self.grad += out.data * out.grad
+                self.grad += out_data * out.grad
 
         out._backward = _back
         out._prev = {self} if self.requires_grad else set()
@@ -176,7 +177,12 @@ class Tensor:
         out_data = self.data.mean(axis=axis, keepdims=keepdims)
         out = Tensor(out_data, requires_grad=self.requires_grad)
         a_shape = self.data.shape
-        n = self.data.size if axis is None else self.data.shape[axis]
+        if axis is None:
+            n = self.data.size
+        elif isinstance(axis, tuple):
+            n = int(np.prod([self.data.shape[a] for a in axis]))
+        else:
+            n = self.data.shape[axis]
 
         def _back():
             if self.requires_grad:

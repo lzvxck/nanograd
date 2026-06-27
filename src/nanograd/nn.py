@@ -67,10 +67,12 @@ class LayerNorm(Module):
 
     def forward(self, x):
         axis = tuple(range(x.ndim - len(self.normalized_shape), x.ndim))
-        mean_data = x.data.mean(axis=axis, keepdims=True).astype(np.float32)
-        var_data = x.data.var(axis=axis, keepdims=True).astype(np.float32)
-        x_hat_data = ((x.data - mean_data) / np.sqrt(var_data + self.eps)).astype(np.float32)
-        x_hat = Tensor(x_hat_data, requires_grad=False)
+        mean_t = x.mean(axis=axis, keepdims=True)
+        xc = x.sub(mean_t)
+        var_t = xc.pow(2.0).mean(axis=axis, keepdims=True)
+        eps_t = Tensor(np.full(var_t.shape, float(self.eps), dtype=np.float32))
+        inv_std = var_t.add(eps_t).pow(-0.5)
+        x_hat = xc.mul(inv_std)
         return x_hat.mul(self.gamma).add(self.beta)
 
 

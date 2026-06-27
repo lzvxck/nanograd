@@ -12,7 +12,7 @@ class SGD:
         for p, v in zip(self.params, self.velocities):
             if p.grad is None:
                 continue
-            v[:] = self.momentum * v + (1.0 - self.momentum) * p.grad
+            v[:] = self.momentum * v + p.grad
             p.data = (p.data - self.lr * v).astype(np.float32)
 
 

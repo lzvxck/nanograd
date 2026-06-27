@@ -46,6 +46,15 @@ def test_layernorm_grad_flows():
     assert not np.all(ln.beta.grad == 0)
 
 
+def test_layernorm_x_grad_flows():
+    ln = LayerNorm(8)
+    x = Tensor(np.random.randn(3, 8).astype(np.float32), requires_grad=True)
+    out = ln(x)
+    out.sum().backward()
+    assert x.grad is not None
+    assert not np.all(x.grad == 0)
+
+
 def test_embedding_lookup():
     emb = Embedding(10, 4)
     indices = np.array([0, 3, 0])
@@ -128,4 +137,4 @@ def test_xor_convergence():
         lin2.zero_grad()
         loss.backward()
         opt.step()
-    assert float(loss.data) < 0.1, f"XOR did not converge: loss={loss.data:.4f}"
+    assert float(loss.data) < 0.01, f"XOR did not converge: loss={loss.data:.4f}"
