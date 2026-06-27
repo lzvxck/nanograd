@@ -1,0 +1,25 @@
+.claude/
+.claude/loops/*
+!.claude/loops/.gitkeep
+
+# Never commit secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+dist/
+*.pyc
