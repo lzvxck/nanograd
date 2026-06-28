@@ -1,3 +1,5 @@
+CLAUDE.md
+
 .claude/
 .claude/loops/*
 !.claude/loops/.gitkeep
