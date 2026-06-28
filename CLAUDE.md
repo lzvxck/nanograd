@@ -20,4 +20,4 @@ pip install -e ".[dev]"
 
 ## Stack
 
-Python 3.12, NumPy ≥2.0 (runtime only). PyTorch ≥2.0 for tests only — never import torch in `src/`.
+Python 3.12, PyTorch ≥2.0 (runtime + tests). NumPy available transitively but not a direct dependency.

@@ -1,38 +1,28 @@
-import sys
-from pathlib import Path
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+torch.manual_seed(0)
 
-import numpy as np
+X = torch.tensor([[0.0, 0.0], [0.0, 1.0], [1.0, 0.0], [1.0, 1.0]])
+y = torch.tensor([0, 1, 1, 0])
 
-from nanograd import Tensor
-from nanograd.nn import Linear
-from nanograd.optim import Adam
+model = nn.Sequential(
+    nn.Linear(2, 16),
+    nn.ReLU(),
+    nn.Linear(16, 2),
+)
+opt = torch.optim.Adam(model.parameters(), lr=0.01)
 
+for step in range(1000):
+    opt.zero_grad()
+    loss = F.cross_entropy(model(X), y)
+    loss.backward()
+    opt.step()
+    if (step + 1) % 200 == 0:
+        print(f"step {step+1:4d}  loss {loss.item():.4f}")
 
-def main():
-    np.random.seed(42)
-    X = Tensor(np.array([[0, 0], [0, 1], [1, 0], [1, 1]], dtype=np.float32))
-    y = np.array([0, 1, 1, 0], dtype=np.int64)
-
-    lin1 = Linear(2, 16)
-    lin2 = Linear(16, 2)
-    opt = Adam([*lin1.parameters(), *lin2.parameters()], lr=0.01)
-
-    loss = None
-    for step in range(1, 1001):
-        logits = lin2(lin1(X).relu())
-        loss = logits.cross_entropy(y)
-        lin1.zero_grad()
-        lin2.zero_grad()
-        loss.backward()
-        opt.step()
-        if step % 100 == 0:
-            print(f"step {step:4d}  loss={loss.data:.6f}")
-
-    assert float(loss.data) < 0.01, f"XOR did not converge: loss={loss.data:.4f}"
-    print("XOR converged!")
-
-
-if __name__ == "__main__":
-    main()
+final_loss = loss.item()
+print(f"final loss: {final_loss:.4f}")
+assert final_loss < 0.01, f"Did not converge: loss={final_loss}"
+print("XOR converged.")
